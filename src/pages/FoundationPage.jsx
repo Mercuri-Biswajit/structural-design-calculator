@@ -1,261 +1,153 @@
 import { useState, useEffect } from 'react'
 import { C, F } from '@styles/tokens'
-import { Card, TwoCol, StatGrid, StatBox, UtilBar, PassFail, TabBtn, Inp, SectionTitle, InfoBox, ResultRow, Divider } from '@components/ui'
-import { analyzeIsolatedFooting, analyzePileGroup } from '@engines/structuralEngine'
+import { Card, TwoCol, StatGrid, StatBox, UtilBar, PassFail, Inp, SectionTitle, InfoBox, ResultRow, Divider } from '@components/ui'
+import { analyzeFoundation } from '../engines/structuralEngine'
+import { SavePanel, SaveToast } from '@components/SavePanel'
+import { useSaveToProject } from '../hooks/useSaveToProject'
 
-// ── FOOTING PLAN SVG ──────────────────────────────────────────
-function FootingPlan({ B, L, colB, colD, proj, qnet, sbc }) {
-  const scale = Math.min(200 / parseFloat(B), 160 / parseFloat(L))
-  const fw = parseFloat(B) * scale, fh = parseFloat(L) * scale
-  const cw = (colB / 1000) * scale, ch = (colD / 1000) * scale
-  const ox = (260 - fw) / 2, oy = (180 - fh) / 2
+function FoundationSketch({ B, L, D, type }) {
+  const sc  = Math.min(200 / Math.max(B, 1), 120 / Math.max(L, 1))
+  const fw  = B * sc, fh = L * sc
+  const ox  = (260 - fw) / 2, oy = (150 - fh) / 2
+  const col = type === 'isolated' ? 40 : fw
   return (
-    <svg width={260} height={200} style={{ display: 'block', margin: '0 auto' }}>
-      <rect x={ox} y={oy} width={fw} height={fh} fill="#e6f9f5" stroke={C.teal} strokeWidth={2} rx={2} />
-      <rect x={ox+(fw-cw)/2} y={oy+(fh-ch)/2} width={cw} height={ch} fill="#c8d8f0" stroke={C.blue} strokeWidth={2} />
-      {/* Critical section for punching (d/2 from col face) */}
-      <rect x={ox+(fw-cw)/2 - 8} y={oy+(fh-ch)/2 - 8} width={cw+16} height={ch+16}
-        fill="none" stroke={C.red} strokeWidth={1} strokeDasharray="4,3" opacity={0.6} />
-      <text x={ox+(fw-cw)/2+cw+12} y={oy+(fh-ch)/2 - 4} fill={C.red} fontSize={7} fontFamily={F.mono}>punch perim.</text>
-      <line x1={ox} y1={oy+fh/2} x2={ox+(fw-cw)/2} y2={oy+fh/2} stroke={C.orange} strokeWidth={1.5} strokeDasharray="4,3" />
-      <text x={ox+(fw-cw)/4} y={oy+fh/2-5} textAnchor="middle" fill={C.orange} fontSize={9} fontFamily={F.mono}>{proj} m</text>
-      <line x1={ox} y1={oy+fh+14} x2={ox+fw} y2={oy+fh+14} stroke={C.inkFaint} strokeWidth={1} />
-      <text x={ox+fw/2} y={oy+fh+26} textAnchor="middle" fill={C.inkMid} fontSize={10} fontFamily={F.mono}>B = {B} m</text>
-      <text x={ox+fw/2} y={oy-8} textAnchor="middle" fill={C.inkLight} fontSize={8} fontFamily={F.mono}>q = {qnet} kN/m²</text>
+    <svg width={260} height={190} style={{ display:'block', margin:'0 auto' }}>
+      {/* Soil hatch */}
+      {Array.from({length:8},(_,i)=>(
+        <line key={i} x1={ox+i*fw/7} y1={oy+fh} x2={ox+i*fw/7-18} y2={oy+fh+20}
+          stroke={C.inkFaint} strokeWidth={0.8}/>
+      ))}
+      <line x1={ox-10} y1={oy+fh} x2={ox+fw+10} y2={oy+fh} stroke={C.inkFaint} strokeWidth={1}/>
+      {/* Foundation body */}
+      <rect x={ox} y={oy} width={fw} height={fh} fill="#dde4ef" stroke={C.blue} strokeWidth={2} rx={2}/>
+      {/* Column stub */}
+      <rect x={ox+(fw-col)/2} y={oy-30} width={col} height={36}
+        fill={C.blueLight} stroke={C.blue} strokeWidth={1.5}/>
+      {/* Rebar dots */}
+      {[ox+8, ox+fw/2, ox+fw-8].map((rx,i)=>(
+        <circle key={i} cx={rx} cy={oy+fh-8} r={4} fill={C.orange}/>
+      ))}
+      {/* Load arrow */}
+      <line x1={ox+fw/2} y1={oy-55} x2={ox+fw/2} y2={oy-32} stroke={C.red} strokeWidth={2.5}/>
+      <polygon points={`${ox+fw/2},${oy-30} ${ox+fw/2-5},${oy-42} ${ox+fw/2+5},${oy-42}`} fill={C.red}/>
+      <text x={ox+fw/2+8} y={oy-44} fill={C.red} fontSize={9} fontFamily={F.mono}>P</text>
+      {/* Labels */}
+      <text x={ox+fw/2} y={oy+fh+32} textAnchor="middle" fill={C.inkMid} fontSize={9} fontFamily={F.mono}>B={B}m</text>
+      <text x={ox-22} y={oy+fh/2} textAnchor="middle" fill={C.inkMid} fontSize={9} fontFamily={F.mono}
+        transform={`rotate(-90,${ox-22},${oy+fh/2})`}>L={L}m</text>
+      <text x={ox+fw+18} y={oy+fh/2+5} textAnchor="middle" fill={C.inkLight} fontSize={8} fontFamily={F.mono}>D={D}m</text>
     </svg>
   )
 }
 
-// ── FOOTING ELEVATION SVG ─────────────────────────────────────
-function FootingElevation({ B, thick, colB }) {
-  const scale = 180 / parseFloat(B)
-  const fw = parseFloat(B) * scale
-  const fh = Math.max(thick * scale * 1.5, 35)
-  const cw = (colB / 1000) * scale
-  const ox = (260 - fw) / 2, oy = 32
-  return (
-    <svg width={260} height={130} style={{ display: 'block', margin: '12px auto 0' }}>
-      <rect x={ox+(fw-cw)/2} y={10} width={cw} height={oy} fill="#c8d8f0" stroke={C.blue} strokeWidth={1.5} />
-      <rect x={ox} y={oy} width={fw} height={fh} fill="#dde4ef" stroke={C.teal} strokeWidth={2} rx={2} />
-      {Array.from({ length: 5 }, (_, i) => (
-        <circle key={i} cx={ox + (i+1)*fw/6} cy={oy + fh - 8} r={4} fill={C.orange} />
-      ))}
-      {/* d_eff marker */}
-      <line x1={ox + fw + 4} y1={oy} x2={ox + fw + 4} y2={oy + fh - 8} stroke={C.green} strokeWidth={1} strokeDasharray="3,2" />
-      <text x={ox + fw + 8} y={oy + fh / 2} fill={C.green} fontSize={7} fontFamily={F.mono}>d</text>
-      <line x1={20} y1={oy+fh+2} x2={240} y2={oy+fh+2} stroke={C.inkMid} strokeWidth={2} />
-      {Array.from({ length: 10 }, (_, i) => (
-        <line key={i} x1={20+i*22} y1={oy+fh+2} x2={14+i*22} y2={oy+fh+10} stroke={C.inkMid} strokeWidth={1} />
-      ))}
-      <text x={130} y={oy+fh+22} textAnchor="middle" fill={C.inkMid} fontSize={9} fontFamily={F.mono}>ELEVATION</text>
-    </svg>
-  )
-}
-
-// ── PILE SKETCH SVG ───────────────────────────────────────────
-function PileSketch({ nPiles, pileD, Q_allow }) {
-  const n = Math.min(nPiles, 9)
-  const cols = Math.ceil(Math.sqrt(n))
-  return (
-    <svg width={280} height={220} style={{ display: 'block', margin: '0 auto' }}>
-      <rect x={30} y={30} width={220} height={28} fill="#dde4ef" stroke={C.teal} strokeWidth={2} rx={2} />
-      {Array.from({ length: n }, (_, i) => {
-        const col = i % cols
-        const cx = cols <= 1 ? 140 : 80 + col * (120 / Math.max(cols - 1, 1))
-        return (
-          <g key={i}>
-            <rect x={cx - 8} y={58} width={16} height={112} fill="#c8d8f0" stroke={C.teal} strokeWidth={1.5} />
-            <ellipse cx={cx} cy={170} rx={8} ry={5} fill={C.teal} opacity={0.6} />
-          </g>
-        )
-      })}
-      <line x1={20} y1={175} x2={260} y2={175} stroke={C.inkMid} strokeWidth={2.5} />
-      {Array.from({ length: 8 }, (_, i) => (
-        <line key={i} x1={20+i*30} y1={175} x2={14+i*30} y2={183} stroke={C.inkMid} strokeWidth={1.5} />
-      ))}
-      <text x={140} y={197} textAnchor="middle" fill={C.inkMid} fontSize={9} fontFamily={F.mono}>Hard Stratum</text>
-      <text x={140} y={212} textAnchor="middle" fill={C.teal} fontSize={10} fontFamily={F.mono}>
-        {nPiles} pile(s) — ⌀{pileD} mm — {Q_allow} kN/pile
-      </text>
-    </svg>
-  )
-}
-
-// ── PAGE ──────────────────────────────────────────────────────
 export default function FoundationPage({ onDataChange }) {
-  const [type, setType]   = useState('isolated')
-  const [P, setP]         = useState(800)
-  const [Mx, setMx]       = useState(40)
-  const [sbc, setSbc]     = useState(150)
-  const [colB, setColB]   = useState(400)
-  const [colD, setColD]   = useState(400)
-  const [fck, setFck]     = useState(25)
-  const [fy, setFy]       = useState(415)
-  const [Df, setDf]       = useState(1.5)
-  const [thick, setThick] = useState(0.5)
-  // Pile inputs
-  const [pileD, setPileD] = useState(0.5)
-  const [pileL, setPileL] = useState(12)
-  const [fs, setFs]       = useState(50)
-  const [fb, setFb]       = useState(5000)
+  const [type,    setType]    = useState('isolated')
+  const [P,       setP]       = useState(600)
+  const [Mx,      setMx]      = useState(40)
+  const [My,      setMy]      = useState(20)
+  const [SBC,     setSBC]     = useState(150)
+  const [D,       setD]       = useState(1.5)
+  const [B,       setB]       = useState(2)
+  const [L,       setL]       = useState(2)
+  const [fck,     setFck]     = useState(25)
+  const [fy,      setFy]      = useState(415)
+  const [gamma,   setGamma]   = useState(18)
 
-  const footing = analyzeIsolatedFooting({ P, Mx, sbc, colB, colD, fck, fy, Df, thick })
-  const pile    = analyzePileGroup({ P, pileD, pileL, fs, fb })
+  const result = analyzeFoundation({ type, P, Mx, My, SBC, D, B, L, fck, fy, gamma })
 
-  useEffect(() => {
-    onDataChange?.({ type, P, Mx, sbc, colB, colD, fck, result: footing })
-  }, [type, P, Mx, sbc, colB, colD, fck, thick, pileD, pileL, fs, fb])
+  useEffect(()=>{ onDataChange?.({ type, P, Mx, My, SBC, D, B, L, fck, fy, gamma, result }) },
+    [type, P, Mx, My, SBC, D, B, L, fck, fy, gamma])
+
+  const moduleData = { type, P, Mx, My, SBC, D, B, L, fck, fy, gamma, result }
+  const { projectName, setProjectName, existingNames, save, isSaving, toastMsg } = useSaveToProject('foundation', moduleData)
 
   return (
-    <TwoCol
-      left={<>
-        <Card>
-          <SectionTitle>Foundation Type</SectionTitle>
-          <div style={{ display: 'flex', gap: 6 }}>
-            {[['isolated','Isolated'],['raft','Raft'],['pile','Pile']].map(([v, l]) => (
-              <TabBtn key={v} active={type === v} onClick={() => setType(v)} color={C.teal}>{l}</TabBtn>
-            ))}
-          </div>
-        </Card>
-
-        <Card>
-          <SectionTitle>Column Loading</SectionTitle>
-          <Inp label="Axial Load P (kN)" value={P} onChange={setP} min={0} />
-          <Inp label="Moment Mx (kNm)" value={Mx} onChange={setMx} min={0} />
-          <Inp label="Column Width (mm)" value={colB} onChange={setColB} min={100} />
-          <Inp label="Column Depth (mm)" value={colD} onChange={setColD} min={100} />
-        </Card>
-
-        {type === 'isolated' && <>
+    <>
+      <TwoCol
+        left={<>
           <Card>
-            <SectionTitle>Soil & Site</SectionTitle>
-            <Inp label="Safe Bearing Capacity (kN/m²)" value={sbc} onChange={setSbc} min={50} />
-            <Inp label="Foundation Depth Df (m)" value={Df} onChange={setDf} min={0.5} step={0.25} />
-            <Inp label="Footing Thickness (m)" value={thick} onChange={setThick} min={0.3} step={0.05} />
-          </Card>
-          <Card>
-            <SectionTitle>Material</SectionTitle>
-            <Inp label="Concrete fck (MPa)" value={fck} onChange={setFck}
-              options={[{v:20,l:'M20'},{v:25,l:'M25'},{v:30,l:'M30'},{v:35,l:'M35'}]} />
-            <Inp label="Steel fy (MPa)" value={fy} onChange={setFy}
-              options={[{v:250,l:'Fe250'},{v:415,l:'Fe415'},{v:500,l:'Fe500'}]} />
-          </Card>
-        </>}
-
-        {type === 'pile' && <>
-          <Card>
-            <SectionTitle>Pile Parameters</SectionTitle>
-            <Inp label="Pile Diameter (m)" value={pileD} onChange={setPileD} min={0.2} max={1.5} step={0.05} />
-            <Inp label="Pile Length (m)" value={pileL} onChange={setPileL} min={3} max={60} />
-          </Card>
-          <Card>
-            <SectionTitle>Soil Resistance (IS 2911)</SectionTitle>
-            <Inp label="Unit Skin Friction fs (kN/m²)" value={fs} onChange={setFs} min={5} step={5} />
-            <Inp label="End Bearing fb (kN/m²)" value={fb} onChange={setFb} min={500} step={500} />
-          </Card>
-        </>}
-      </>}
-
-      right={<>
-        {type === 'isolated' && <>
-          <Card>
-            <SectionTitle>Footing Plan & Elevation</SectionTitle>
-            <FootingPlan B={footing.B} L={footing.L} colB={colB} colD={colD}
-              proj={footing.proj} qnet={footing.qnet} sbc={sbc} />
-            <FootingElevation B={footing.B} thick={thick} colB={colB} />
-          </Card>
-
-          <Card>
-            <StatGrid cols={3}>
-              <StatBox label="Size B×L" value={`${footing.B}×${footing.L}`} unit="m" color={C.teal} />
-              <StatBox label="d effective" value={footing.d_eff} unit="mm" color={C.blue} />
-              <StatBox label="Net q" value={footing.qnet} unit="kN/m²" color={C.orange} />
-            </StatGrid>
-          </Card>
-
-          {/* Bearing check */}
-          <Card accentColor={footing.passSBC ? C.green : C.red}>
-            <PassFail pass={footing.passSBC} code="IS 456:2000 Cl. 34 — Bearing Pressure" />
-            <ResultRow label="q_max (eccentric)" value={footing.q_max} unit="kN/m²" />
-            <ResultRow label="q_min" value={footing.q_min} unit="kN/m²" />
-            <ResultRow label="SBC limit" value={sbc} unit="kN/m²" highlight />
-            <div style={{ height: 10 }} />
-            <UtilBar pct={footing.bearingUtil} label="Bearing Utilization" color={C.teal} />
-          </Card>
-
-          {/* Flexure check */}
-          <Card accentColor={footing.passM ? C.green : C.red}>
-            <PassFail pass={footing.passM} code="IS 456:2000 Cl. 34.4 — Flexure" />
-            <ResultRow label="Mu (critical section)" value={footing.Mu_found} unit="kNm/m" />
-            <ResultRow label="Mulim" value={footing.Mulim} unit="kNm/m" highlight />
-            <Divider />
-            <ResultRow label="Ast required" value={footing.Ast_m} unit="mm²/m" />
-            <ResultRow label={`⌀${footing.barDia} @ ${footing.spcOk} mm c/c`} value="provided" highlight />
-            <div style={{ height: 10 }} />
-            <UtilBar pct={footing.momentUtil} label="Moment Utilization" />
-          </Card>
-
-          {/* Punching shear */}
-          <Card accentColor={footing.punchPass ? C.green : C.red}>
-            <PassFail pass={footing.punchPass} code="IS 456:2000 Cl. 31.6 — Punching Shear" />
-            <ResultRow label="τv (punching)" value={footing.tau_vp} unit="N/mm²" />
-            <ResultRow label="τcp (allowable)" value={footing.tau_cp} unit="N/mm²" highlight />
-          </Card>
-        </>}
-
-        {type === 'raft' && <>
-          <Card>
-            <SectionTitle>Raft Foundation (IS 2950)</SectionTitle>
-            <svg width="100%" height={130} viewBox="0 0 560 130">
-              <rect x={20} y={60} width={520} height={25} fill="#dde4ef" stroke={C.teal} strokeWidth={2} />
-              {[80,180,280,380,480].map(cx => (
-                <rect key={cx} x={cx-25} y={20} width={50} height={40} fill="#c8d8f0" stroke={C.blue} strokeWidth={1.5} />
+            <SectionTitle>Foundation Type</SectionTitle>
+            <div style={{ display:'flex', gap:8 }}>
+              {['isolated','combined','strip','raft'].map(t => (
+                <button key={t} onClick={()=>setType(t)} style={{
+                  padding:'5px 11px', borderRadius:6, border:`1.5px solid ${type===t?C.blue:C.border}`,
+                  background: type===t?C.blueLight:'#fff', color: type===t?C.blue:C.inkLight,
+                  fontSize:11, fontFamily:F.sans, fontWeight:600, cursor:'pointer', textTransform:'capitalize',
+                }}>{t}</button>
               ))}
-              <text x={280} y={105} textAnchor="middle" fill={C.teal} fontSize={11} fontFamily={F.mono}>RAFT SLAB</text>
-              <line x1={10} y1={90} x2={550} y2={90} stroke={C.inkMid} strokeWidth={1} />
-            </svg>
+            </div>
           </Card>
           <Card>
-            <InfoBox color={C.teal} lightColor={C.tealLight}>
-              <strong>When to use Raft Foundation (IS 2950):</strong><br /><br />
-              • SBC is low ({'<'} 100 kN/m²) or soil is expansive<br />
-              • Differential settlement is a concern<br />
-              • Column loads are heavy and closely spaced<br /><br />
-              <strong>Design Methods:</strong><br />
-              • Conventional rigid method (stiff rafts)<br />
-              • Flexible plate theory (flexible rafts)<br /><br />
-              <strong>Min Thickness:</strong> L/20 or 300 mm (whichever is greater)<br />
-              <strong>Reinforcement:</strong> Two-way top & bottom
-            </InfoBox>
+            <SectionTitle>Applied Loads</SectionTitle>
+            <Inp label="Column Load P (kN)"      value={P}  onChange={setP}  min={0}/>
+            <Inp label="Moment Mx (kNm)"          value={Mx} onChange={setMx} min={0}/>
+            <Inp label="Moment My (kNm)"          value={My} onChange={setMy} min={0}/>
+          </Card>
+          <Card>
+            <SectionTitle>Soil & Depth</SectionTitle>
+            <Inp label="Safe Bearing Capacity (kN/m²)" value={SBC}   onChange={setSBC}   min={50}/>
+            <Inp label="Foundation Depth D (m)"         value={D}     onChange={setD}     min={0.5} step={0.1}/>
+            <Inp label="Soil Unit Weight γ (kN/m³)"     value={gamma} onChange={setGamma} min={14}  step={0.5}/>
+          </Card>
+          <Card>
+            <SectionTitle>Footing Size</SectionTitle>
+            <Inp label="Width B (m)"  value={B} onChange={setB} min={0.5} step={0.1}/>
+            <Inp label="Length L (m)" value={L} onChange={setL} min={0.5} step={0.1}/>
+          </Card>
+          <Card>
+            <SectionTitle>Material Grade</SectionTitle>
+            <Inp label="Concrete fck (MPa)" value={fck} onChange={setFck}
+              options={[{v:20,l:'M20'},{v:25,l:'M25'},{v:30,l:'M30'},{v:35,l:'M35'}]}/>
+            <Inp label="Steel fy (MPa)" value={fy} onChange={setFy}
+              options={[{v:250,l:'Fe250'},{v:415,l:'Fe415'},{v:500,l:'Fe500'}]}/>
           </Card>
         </>}
 
-        {type === 'pile' && <>
-          <Card>
-            <SectionTitle>Pile Group Layout</SectionTitle>
-            <PileSketch nPiles={pile.nPiles} pileD={pile.pileD} Q_allow={pile.Q_allow} />
-          </Card>
+        right={<>
+          <SavePanel moduleLabel="Foundation Design" moduleIcon="⊓" accentColor="#0891b2"
+            projectName={projectName} setProjectName={setProjectName} existingNames={existingNames}
+            onSave={save} isSaving={isSaving} hasData={true}/>
 
+          <Card>
+            <SectionTitle>Foundation Schematic</SectionTitle>
+            <FoundationSketch B={result.B} L={result.L} D={D} type={type}/>
+          </Card>
           <Card>
             <StatGrid cols={3}>
-              <StatBox label="Piles Required" value={pile.nPiles} color={C.teal} />
-              <StatBox label="Allowable/Pile" value={pile.Q_allow} unit="kN" color={C.blue} />
-              <StatBox label="Group Eff." value={`${pile.Eg}%`} color={pile.groupPass ? C.green : C.red} />
+              <StatBox label="Net Pressure" value={result.qnet}   unit="kN/m²" color={C.blue}/>
+              <StatBox label="Gross qmax"   value={result.qmax}   unit="kN/m²" color={C.orange}/>
+              <StatBox label="Depth d_eff"  value={result.d_eff}  unit="mm"    color={C.inkMid}/>
             </StatGrid>
           </Card>
-
-          <Card accentColor={pile.groupPass ? C.green : C.red}>
-            <PassFail pass={pile.groupPass} code="IS 2911 — Pile Group Capacity" />
-            <ResultRow label="Skin Friction Capacity" value={pile.Q_skin} unit="kN" />
-            <ResultRow label="End Bearing Capacity" value={pile.Q_end} unit="kN" />
-            <ResultRow label="Allowable per Pile (FOS 2.5)" value={pile.Q_allow} unit="kN" highlight />
-            <Divider />
-            <ResultRow label="Min Pile Spacing" value={pile.spacing} unit="mm" />
-            <ResultRow label="Group Efficiency" value={`${pile.Eg}%`} highlight />
-            <ResultRow label="Group Load Capacity" value={pile.Q_group} unit="kN" />
+          <Card accentColor={result.passSBC ? C.green : C.red}>
+            <PassFail pass={result.passSBC} code="IS 1904:1986 — Bearing Capacity Check"/>
+            <ResultRow label="Net soil pressure qnet" value={result.qnet}  unit="kN/m²"/>
+            <ResultRow label="Safe Bearing Capacity"  value={SBC}           unit="kN/m²" highlight/>
+            <div style={{height:10}}/>
+            <UtilBar pct={((result.qnet/SBC)*100).toFixed(1)} label="Bearing Pressure Utilization"/>
+          </Card>
+          <Card accentColor={result.passM ? C.green : C.red}>
+            <PassFail pass={result.passM} code="IS 456:2000 Cl. 34 — Flexure Design"/>
+            <ResultRow label="Design Moment Mu"       value={result.Mu}      unit="kNm/m"/>
+            <ResultRow label="Capacity Mulim"         value={result.Mulim}   unit="kNm/m" highlight/>
+            <Divider/>
+            <ResultRow label="Ast required"           value={result.Ast_req} unit="mm²/m"/>
+            <ResultRow label="Ast minimum"            value={result.Ast_min} unit="mm²/m"/>
+            <ResultRow label={`⌀${result.barDia} @ ${result.spcOk} mm c/c`} value={result.Ast_prov} unit="mm²/m" highlight/>
+          </Card>
+          <Card accentColor={result.punchPass ? C.green : C.red}>
+            <PassFail pass={result.punchPass} code="IS 456:2000 Cl. 31.6 — Punching Shear"/>
+            <ResultRow label="Punching shear stress" value={result.tau_v_punch} unit="N/mm²"/>
+            <ResultRow label="Permissible (ks·τc)"   value={result.tau_c_punch} unit="N/mm²" highlight/>
+          </Card>
+          <Card accentColor={result.shearPass ? C.green : C.red}>
+            <PassFail pass={result.shearPass} code="IS 456:2000 Cl. 31.7 — One-way Shear"/>
+            <ResultRow label="Shear stress τv" value={result.tau_v_shear} unit="N/mm²"/>
+            <ResultRow label="Permissible τc"  value={result.tau_c_shear} unit="N/mm²" highlight/>
           </Card>
         </>}
-      </>}
-    />
+      />
+      <SaveToast msg={toastMsg}/>
+    </>
   )
 }

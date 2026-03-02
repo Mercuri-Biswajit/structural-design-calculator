@@ -5,10 +5,9 @@ export const ROUTES = [
     label: "Beam",
     fullLabel: "Beam Design",
     icon: "━",
-    description:
-      "Beam analysis & design · IS 456:2000 / IS 800:2007 · SFD & BMD diagrams",
+    description: "Beam analysis & design · IS 456:2000 / IS 800:2007 · SFD & BMD diagrams",
     codes: ["IS 456", "IS 800"],
-    color: "#16a34a",
+    color: "#0f2d5c",
   },
   {
     path: "/column",
@@ -16,10 +15,9 @@ export const ROUTES = [
     label: "Column",
     fullLabel: "Column Design",
     icon: "║",
-    description:
-      "Axial + biaxial bending · IS 456:2000 / IS 800:2007 · Slenderness check",
+    description: "Axial + biaxial bending · IS 456:2000 / IS 800:2007 · Slenderness check",
     codes: ["IS 456", "IS 800"],
-    color: "#16a34a",
+    color: "#1a4080",
   },
   {
     path: "/slab",
@@ -27,8 +25,7 @@ export const ROUTES = [
     label: "Slab",
     fullLabel: "Slab Design",
     icon: "▭",
-    description:
-      "One-way & two-way slabs · IS 456:2000 Cl. 24 · Moment coefficients",
+    description: "One-way & two-way slabs · IS 456:2000 Cl. 24 · Moment coefficients",
     codes: ["IS 456"],
     color: "#16a34a",
   },
@@ -38,8 +35,7 @@ export const ROUTES = [
     label: "Foundation",
     fullLabel: "Foundation Design",
     icon: "⊓",
-    description:
-      "Isolated, raft & pile foundations · IS 456:2000 Cl. 34 / IS 2950",
+    description: "Isolated, raft & pile foundations · IS 456:2000 Cl. 34 / IS 2950",
     codes: ["IS 456", "IS 2950"],
     color: "#0891b2",
   },
@@ -49,8 +45,7 @@ export const ROUTES = [
     label: "Road",
     fullLabel: "Road Design",
     icon: "↗",
-    description:
-      "Horizontal & vertical curves · Pavement layers · IRC 37 / IRC 52 / IRC 73",
+    description: "Horizontal & vertical curves · Pavement layers · IRC 37 / IRC 52 / IRC 73",
     codes: ["IRC 37", "IRC 52", "IRC 73"],
     color: "#7c3aed",
   },
@@ -60,10 +55,9 @@ export const ROUTES = [
     label: "Bridge",
     fullLabel: "Bridge Loads",
     icon: "⌒",
-    description:
-      "IRC:6 live loads · Class A, B, AA · Moment & reaction analysis",
+    description: "IRC:6 live loads · Class A, B, AA · Moment & reaction analysis",
     codes: ["IRC 6"],
-    color: "#7c3aed",
+    color: "#9333ea",
   },
   {
     path: "/boq",
@@ -71,10 +65,9 @@ export const ROUTES = [
     label: "BOQ",
     fullLabel: "Estimation & BOQ",
     icon: "₹",
-    description:
-      "Concrete estimator · Bill of quantities · Material rate analysis",
+    description: "Concrete estimator · Bill of quantities · Material rate analysis",
     codes: [],
-    color: "#ea580c",
+    color: "#e8630a",
   },
   {
     path: "/report",
@@ -82,10 +75,19 @@ export const ROUTES = [
     label: "Report",
     fullLabel: "Design Report",
     icon: "↓",
-    description:
-      "Fill project info & export consolidated design report to Excel (.xlsx)",
+    description: "Fill project info & export consolidated design report to Excel (.xlsx)",
     codes: [],
     color: "#16a34a",
+  },
+  {
+    path: "/dashboard",
+    id: "dashboard",
+    label: "Dashboard",
+    fullLabel: "Project Dashboard",
+    icon: "📈",
+    description: "Track design sessions · Saved reports · Module status · Activity log",
+    codes: [],
+    color: "#e8630a",
   },
 ];
 

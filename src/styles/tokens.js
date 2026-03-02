@@ -1,23 +1,37 @@
-// ── COLOR PALETTE ─────────────────────────────────────────────
+// ── COLOR PALETTE — Light theme, Navy · Orange · Green for elements ─
 export const C = {
-  // Surfaces
-  bg:       '#f7f8f6',
+  // Surfaces — clean white/light
+  bg:       '#f5f7fa',
   bgCard:   '#ffffff',
-  bgAlt:    '#f2f4f1',
-  bgInput:  '#f7f8f6',
-  bgHover:  '#f0f4f0',
+  bgAlt:    '#f0f3f8',
+  bgInput:  '#f8fafc',
+  bgHover:  '#eef2f8',
 
   // Borders
-  border:      '#e4e8e2',
-  borderMid:   '#d4d9d2',
+  border:      '#d0dae8',
+  borderMid:   '#b8c8d8',
 
   // Ink
-  ink:      '#111612',
-  inkMid:   '#3d4a3e',
-  inkLight: '#7a8c7c',
-  inkFaint: '#b8c4b9',
+  ink:      '#0d1e35',
+  inkMid:   '#2c4160',
+  inkLight: '#6b85a0',
+  inkFaint: '#a8bfd0',
 
-  // Green accent — the one brand color
+  // Navy — primary brand color
+  navy:        '#0f2d5c',
+  navyMid:     '#1a4080',
+  navyLight:   '#e8f0f9',
+  navyGlow:    'rgba(15,45,92,0.12)',
+  navyBright:  '#2563b0',
+
+  // Orange — secondary accent
+  orange:      '#e8630a',
+  orangeMid:   '#c85508',
+  orangeLight: '#fff3eb',
+  orangeGlow:  'rgba(232,99,10,0.15)',
+  orangeBright:'#ff7a2a',
+
+  // Green — tertiary accent / success
   green:      '#16a34a',
   greenDim:   '#15803d',
   greenLight: '#f0fdf4',
@@ -29,8 +43,6 @@ export const C = {
   blueLight:   '#eff6ff',
   red:         '#dc2626',
   redLight:    '#fef2f2',
-  orange:      '#ea580c',
-  orangeLight: '#fff7ed',
   yellow:      '#ca8a04',
   yellowLight: '#fefce8',
   purple:      '#7c3aed',
@@ -39,15 +51,17 @@ export const C = {
   tealLight:   '#ecfeff',
 
   // Elevation
-  shadowXs: '0 1px 2px rgba(17,22,18,0.05)',
-  shadow:   '0 1px 6px rgba(17,22,18,0.07)',
-  shadowMd: '0 4px 16px rgba(17,22,18,0.09)',
+  shadowXs: '0 1px 3px rgba(15,45,92,0.08)',
+  shadow:   '0 2px 8px rgba(15,45,92,0.10)',
+  shadowMd: '0 4px 20px rgba(15,45,92,0.13)',
+  shadowLg: '0 8px 40px rgba(15,45,92,0.16)',
 }
 
 // ── TYPOGRAPHY ─────────────────────────────────────────────────
 export const F = {
   sans: "'Plus Jakarta Sans', sans-serif",
   mono: "'DM Mono', monospace",
+  display: "'Plus Jakarta Sans', sans-serif",
 }
 
 // ── REUSABLE STYLE OBJECTS ─────────────────────────────────────
@@ -91,9 +105,9 @@ export const badge = (color, bg) => ({
   background:    bg,
   color,
   fontFamily:    F.mono,
-  fontSize:      12,
+  fontSize:      11,
   padding:       '2px 8px',
   borderRadius:  4,
-  fontWeight:    500,
+  fontWeight:    600,
   letterSpacing: '0.5px',
 })
