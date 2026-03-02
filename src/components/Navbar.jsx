@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { C, F, badge } from "@styles/tokens";
 import { ROUTES } from "@routes/index";
 
-import logo from "../../public/assets/icons/My__Logo.png";
+import logo from "../assets/icons/My__Logo.png";
 
 import "../styles/navbar.css";
 
