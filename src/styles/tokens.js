@@ -91,7 +91,7 @@ export const badge = (color, bg) => ({
   background:    bg,
   color,
   fontFamily:    F.mono,
-  fontSize:      9.5,
+  fontSize:      12,
   padding:       '2px 8px',
   borderRadius:  4,
   fontWeight:    500,

@@ -1,0 +1,118 @@
+/* Navbar Styles */
+
+.navbar-header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+.navbar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  height: 75px;
+  gap: 20px;
+}
+
+.navbar-logo-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+}
+
+.navbar-logo-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.navbar-logo-mark svg {
+  width: 17px;
+  height: 17px;
+}
+
+.navbar-logo-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.navbar-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar-logo-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  line-height: 1;
+}
+
+.navbar-logo-subtitle {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.navbar-divider {
+  width: 1px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.navbar-nav {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  overflow-x: auto;
+  flex: 1;
+  scrollbar-width: none;
+}
+
+.navbar-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.navbar-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 5px;
+  border-radius: 6px;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.14s ease;
+}
+
+.navbar-link.active {
+  font-weight: 600;
+}
+
+.navbar-icon {
+  font-size: 15px;
+  opacity: 0.75;
+}
+
+.navbar-badges {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.navbar-badges-code {
+  font-size: 2rem;
+}
