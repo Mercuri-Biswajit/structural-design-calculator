@@ -1,0 +1,22 @@
+{
+  "name": "structure-design",
+  "version": "2.0.0",
+  "description": "Civil & Structural Engineering Design Suite",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3",
+    "xlsx": "^0.18.5",
+    "file-saver": "^2.0.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.1.4"
+  }
+}

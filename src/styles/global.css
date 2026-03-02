@@ -1,0 +1,134 @@
+/* ── RESET ──────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── DESIGN TOKENS ──────────────────────────────────────────── */
+:root {
+  /* Surfaces — pure white hierarchy */
+  --bg:        #f7f8f6;
+  --bg-card:   #ffffff;
+  --bg-alt:    #f2f4f1;
+  --bg-input:  #f7f8f6;
+  --bg-hover:  #f0f4f0;
+
+  /* Borders */
+  --border:       #e4e8e2;
+  --border-mid:   #d4d9d2;
+  --border-focus: #16a34a;
+
+  /* Ink — cool neutral */
+  --ink:        #111612;
+  --ink-mid:    #3d4a3e;
+  --ink-light:  #7a8c7c;
+  --ink-faint:  #b8c4b9;
+
+  /* Green — the one accent */
+  --green:        #16a34a;
+  --green-dim:    #15803d;
+  --green-light:  #f0fdf4;
+  --green-mid:    #dcfce7;
+  --green-glow:   rgba(22,163,74,0.12);
+
+  /* Semantic — desaturated to not compete with green */
+  --blue:         #2563eb;
+  --blue-light:   #eff6ff;
+  --red:          #dc2626;
+  --red-light:    #fef2f2;
+  --orange:       #ea580c;
+  --orange-light: #fff7ed;
+  --yellow:       #ca8a04;
+  --yellow-light: #fefce8;
+  --purple:       #7c3aed;
+  --purple-light: #f5f3ff;
+  --teal:         #0891b2;
+  --teal-light:   #ecfeff;
+
+  /* Elevation — very subtle, clean */
+  --shadow-xs: 0 1px 2px rgba(17,22,18,0.05);
+  --shadow-sm: 0 1px 6px rgba(17,22,18,0.07);
+  --shadow-md: 0 4px 16px rgba(17,22,18,0.09);
+  --shadow-lg: 0 8px 32px rgba(17,22,18,0.11);
+
+  /* Typography */
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  /* Transitions */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast: 100ms;
+  --t-base: 180ms;
+  --t-slow: 300ms;
+}
+
+/* ── BASE ───────────────────────────────────────────────────── */
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+input, select, button, textarea { font-family: inherit; }
+button { cursor: pointer; }
+a { text-decoration: none; }
+
+/* Clean number inputs */
+input[type="number"] { -moz-appearance: textfield; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+/* Custom select arrow */
+select {
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a8c7c'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px !important;
+  cursor: pointer;
+}
+
+/* Minimal scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+
+/* Focus — green ring */
+*:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+  border-radius: 5px;
+}
+
+/* ── ANIMATIONS ─────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.anim-fadeUp     { animation: fadeUp     var(--t-slow) var(--ease) both; }
+.anim-slideRight { animation: slideRight var(--t-slow) var(--ease) both; }
+
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 50ms; }
+.stagger > *:nth-child(3) { animation-delay: 100ms; }
+.stagger > *:nth-child(4) { animation-delay: 150ms; }
+.stagger > *:nth-child(5) { animation-delay: 200ms; }
+.stagger > *:nth-child(6) { animation-delay: 250ms; }

@@ -1,0 +1,92 @@
+export const ROUTES = [
+  {
+    path: "/beam",
+    id: "beam",
+    label: "Beam",
+    fullLabel: "Beam Design",
+    icon: "━",
+    description:
+      "Beam analysis & design · IS 456:2000 / IS 800:2007 · SFD & BMD diagrams",
+    codes: ["IS 456", "IS 800"],
+    color: "#16a34a",
+  },
+  {
+    path: "/column",
+    id: "column",
+    label: "Column",
+    fullLabel: "Column Design",
+    icon: "║",
+    description:
+      "Axial + biaxial bending · IS 456:2000 / IS 800:2007 · Slenderness check",
+    codes: ["IS 456", "IS 800"],
+    color: "#16a34a",
+  },
+  {
+    path: "/slab",
+    id: "slab",
+    label: "Slab",
+    fullLabel: "Slab Design",
+    icon: "▭",
+    description:
+      "One-way & two-way slabs · IS 456:2000 Cl. 24 · Moment coefficients",
+    codes: ["IS 456"],
+    color: "#16a34a",
+  },
+  {
+    path: "/foundation",
+    id: "foundation",
+    label: "Foundation",
+    fullLabel: "Foundation Design",
+    icon: "⊓",
+    description:
+      "Isolated, raft & pile foundations · IS 456:2000 Cl. 34 / IS 2950",
+    codes: ["IS 456", "IS 2950"],
+    color: "#0891b2",
+  },
+  {
+    path: "/road",
+    id: "road",
+    label: "Road",
+    fullLabel: "Road Design",
+    icon: "↗",
+    description:
+      "Horizontal & vertical curves · Pavement layers · IRC 37 / IRC 52 / IRC 73",
+    codes: ["IRC 37", "IRC 52", "IRC 73"],
+    color: "#7c3aed",
+  },
+  {
+    path: "/bridge",
+    id: "bridge",
+    label: "Bridge",
+    fullLabel: "Bridge Loads",
+    icon: "⌒",
+    description:
+      "IRC:6 live loads · Class A, B, AA · Moment & reaction analysis",
+    codes: ["IRC 6"],
+    color: "#7c3aed",
+  },
+  {
+    path: "/boq",
+    id: "boq",
+    label: "BOQ",
+    fullLabel: "Estimation & BOQ",
+    icon: "₹",
+    description:
+      "Concrete estimator · Bill of quantities · Material rate analysis",
+    codes: [],
+    color: "#ea580c",
+  },
+  {
+    path: "/report",
+    id: "report",
+    label: "Report",
+    fullLabel: "Design Report",
+    icon: "↓",
+    description:
+      "Fill project info & export consolidated design report to Excel (.xlsx)",
+    codes: [],
+    color: "#16a34a",
+  },
+];
+
+export const DEFAULT_PATH = "/beam";
