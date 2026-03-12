@@ -18,8 +18,14 @@
   box-shadow: 1px 0 10px rgba(0, 0, 0, 0.02);
 }
 
-.sidebar::-webkit-scrollbar { width: 3px; }
-.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.sidebar::-webkit-scrollbar {
+  width: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
 
 /* Logo */
 .sidebar__logo {

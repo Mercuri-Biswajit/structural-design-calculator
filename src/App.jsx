@@ -29,14 +29,21 @@ export default function App() {
       {/* Main content area */}
       <div
         style={{
-          marginLeft: 'var(--sidebar-width)',
-          minHeight: '100vh',
-          width: 'calc(100% - var(--sidebar-width))',
-          transition: 'margin-left 0.25s ease, width 0.25s ease',
+          marginLeft: "var(--sidebar-width)",
+          minHeight: "100vh",
+          width: "calc(100% - var(--sidebar-width))",
+          transition: "margin-left 0.25s ease, width 0.25s ease",
         }}
       >
-        <main style={{ maxWidth: '100%', margin: '0 10px' }}>
-          <div style={{ padding: '24px 32px 72px', width: '100%', maxWidth: '1600px', margin: '0 auto' }}>
+        <main style={{ maxWidth: "100%", margin: "0 10px" }}>
+          <div
+            style={{
+              padding: "24px 32px 72px",
+              width: "100%",
+              maxWidth: "1600px",
+              margin: "0 auto",
+            }}
+          >
             <HeroHeader />
 
             <Routes>

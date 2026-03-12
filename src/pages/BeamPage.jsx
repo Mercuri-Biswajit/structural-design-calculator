@@ -23,11 +23,11 @@ import { useSaveToProject } from "../hooks/useSaveToProject";
 
 function BeamSchematic({ span, loads, support, material }) {
   const W = 560,
-    H = 90,
+    H = 110, // Increased height
     lx = 40,
     rx = W - 20,
     pw = rx - lx,
-    bY = 48;
+    bY = 56; // Adjusted base Y
   const toX = (v) => lx + (v / Math.max(span, 0.01)) * pw;
   
   const fill = material === 'concrete' ? 'url(#concrete)' : 'url(#steel)'
@@ -43,13 +43,16 @@ function BeamSchematic({ span, loads, support, material }) {
       {/* Beam Body */}
       <motion.rect
         layout
+        initial={{ pathLength: 0, fillOpacity: 0 }}
+        animate={{ pathLength: 1, fillOpacity: 1 }}
+        transition={{ duration: 1.5, ease: "easeInOut" }}
         x={lx}
-        y={bY - 6}
+        y={bY - 8} // Adjusted for new thickness
         width={pw}
-        height={12}
+        height={16} // Increased thickness
         fill={fill}
         stroke={stroke}
-        strokeWidth={2}
+        strokeWidth={2.5} // Increased stroke width
         rx={material === 'concrete' ? 2 : 0}
         filter="url(#shadow)"
       />
@@ -57,32 +60,43 @@ function BeamSchematic({ span, loads, support, material }) {
       {/* Supports */}
       <AnimatePresence>
         {support === "simply" && (
-          <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <motion.g 
+            initial={{ opacity: 0, y: 10 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            exit={{ opacity: 0 }}
+            transition={{ delay: 1 }}
+          >
             <polygon
-              points={`${lx},${bY + 6} ${lx - 10},${bY + 22} ${lx + 10},${bY + 22}`}
+              points={`${lx},${bY + 8} ${lx - 12},${bY + 28} ${lx + 12},${bY + 28}`} // Increased support size
               fill={C.bgInput}
               stroke={C.inkMid}
-              strokeWidth={1.5}
+              strokeWidth={2}
             />
             <polygon
-              points={`${rx},${bY + 6} ${rx - 10},${bY + 22} ${rx + 10},${bY + 22}`}
+              points={`${rx},${bY + 8} ${rx - 12},${bY + 28} ${rx + 12},${bY + 28}`}
               fill={C.bgInput}
               stroke={C.inkMid}
-              strokeWidth={1.5}
+              strokeWidth={2}
             />
           </motion.g>
         )}
         {support === "cantilever" && (
           <motion.rect
-            initial={{ height: 0 }} animate={{ height: 36 }}
-            x={lx - 16} y={bY - 18} width={16} height={36}
-            fill="url(#soil)" opacity={0.3} stroke={C.inkMid} strokeWidth={1.5} rx={2}
+            initial={{ height: 0, opacity: 0 }} 
+            animate={{ height: 44, opacity: 0.3 }}
+            transition={{ delay: 0.8 }}
+            x={lx - 18} y={bY - 22} width={18} height={44} // Increased support size
+            fill="url(#soil)" opacity={0.3} stroke={C.inkMid} strokeWidth={2} rx={2}
           />
         )}
         {support === "fixed" && (
-          <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <rect x={lx - 12} y={bY - 16} width={12} height={32} fill="url(#soil)" opacity={0.3} stroke={C.inkMid} strokeWidth={1.5} rx={2} />
-            <rect x={rx} y={bY - 16} width={12} height={32} fill="url(#soil)" opacity={0.3} stroke={C.inkMid} strokeWidth={1.5} rx={2} />
+          <motion.g 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            <rect x={lx - 14} y={bY - 20} width={14} height={40} fill="url(#soil)" opacity={0.3} stroke={C.inkMid} strokeWidth={2} rx={2} />
+            <rect x={rx} y={bY - 20} width={14} height={40} fill="url(#soil)" opacity={0.3} stroke={C.inkMid} strokeWidth={2} rx={2} />
           </motion.g>
         )}
       </AnimatePresence>
@@ -99,18 +113,36 @@ function BeamSchematic({ span, loads, support, material }) {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scaleY: 0 }}
+                transition={{ delay: 1.5 + i * 0.1 }}
               >
-                <line x1={x1} y1={12} x2={x2} y2={12} stroke={C.orange} strokeWidth={2.5} strokeLinecap="round" />
+                <motion.line 
+                    x1={x1} y1={14} x2={x2} y2={14} 
+                    stroke={C.orange} strokeWidth={3} strokeLinecap="round" 
+                    initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 1.5 + i*0.1, duration: 0.8 }}
+                />
                 {Array.from({ length: cnt + 1 }, (_, j) => {
                   const ax = x1 + (j / cnt) * (x2 - x1);
                   return (
                     <g key={j}>
-                      <line x1={ax} y1={12} x2={ax} y2={34} stroke={C.orange} strokeWidth={1.5} />
-                      <polygon points={`${ax},34 ${ax - 3.5},24 ${ax + 3.5},24`} fill={C.orange} />
+                      <motion.line 
+                        x1={ax} y1={14} x2={ax} y2={40}  // Adjusted arrows for thicker beam
+                        stroke={C.orange} strokeWidth={2} 
+                        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 1.8 + i*0.1, duration: 0.3 }}
+                      />
+                      <motion.polygon 
+                        points={`${ax},40 ${ax - 4.5},28 ${ax + 4.5},28`} // Larger arrow heads
+                        fill={C.orange} 
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.1 + i*0.1 }}
+                      />
                     </g>
                   );
                 })}
-                <text x={(x1 + x2) / 2} y={8} textAnchor="middle" fill={C.orange} fontSize={10} fontWeight={800}>{l.w} kN/m</text>
+                <motion.text 
+                    x={(x1 + x2) / 2} y={10} textAnchor="middle" fill={C.orange} fontSize={12} fontWeight={800} // Increased font size
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.1 + i*0.1 }}
+                >
+                    {l.w} kN/m
+                </motion.text>
               </motion.g>
             );
           }
@@ -121,17 +153,37 @@ function BeamSchematic({ span, loads, support, material }) {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.5 }}
+              transition={{ delay: 1.5 + i * 0.1 }}
             >
-              <line x1={ax} y1={4} x2={ax} y2={34} stroke={C.purple} strokeWidth={3} strokeLinecap="round" />
-              <polygon points={`${ax},34 ${ax - 5},22 ${ax + 5},22`} fill={C.purple} />
-              <text x={ax} y={2} textAnchor="middle" fill={C.purple} fontSize={10} fontWeight={800}>{l.p}kN</text>
+              <motion.line 
+                x1={ax} y1={4} x2={ax} y2={40} stroke={C.purple} strokeWidth={3.5} strokeLinecap="round" // Adjusted for thicker beam
+                initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 1.5 + i*0.1, duration: 0.5 }}
+              />
+              <motion.polygon 
+                points={`${ax},40 ${ax - 6},26 ${ax + 6},26`} fill={C.purple} // Larger arrow heads
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.0 + i*0.1 }}
+              />
+              <motion.text 
+                x={ax} y={2} textAnchor="middle" fill={C.purple} fontSize={12} fontWeight={800} // Increased font size
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.0 + i*0.1 }}
+              >
+                  {l.p}kN
+              </motion.text>
             </motion.g>
           );
         })}
       </AnimatePresence>
 
-      <line x1={lx} y1={H - 8} x2={rx} y2={H - 8} stroke={C.inkFaint} strokeWidth={1} />
-      <text x={(lx + rx) / 2} y={H - 2} textAnchor="middle" fill={C.inkLight} fontSize={10} fontWeight={700}>L = {span} m</text>
+      <motion.line 
+        x1={lx} y1={H - 12} x2={rx} y2={H - 12} stroke={C.inkFaint} strokeWidth={1.5} // pushed further down
+        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.5, duration: 1 }}
+      />
+      <motion.text 
+        x={(lx + rx) / 2} y={H - 4} textAnchor="middle" fill={C.inkMid} fontSize={12} fontWeight={800} // Increased font size
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
+      >
+        L = {span} m
+      </motion.text>
     </motion.svg>
   );
 }
