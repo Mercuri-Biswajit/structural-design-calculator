@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { C, F, badge } from "@styles/tokens";
-import './BeamPage.css';
 import {
   Card,
   TwoCol,
